@@ -179,6 +179,7 @@ function OpenFloats(results, unkownclasses)
     local longest = Utils.get_longest(formatted_results, #title)
     local height = #formatted_results
 
+
     local buf, win = vim.lsp.util.open_floating_preview(formatted_results, "css", {
         border = M.options.border,
         width = longest,
@@ -197,14 +198,19 @@ function OpenFloats(results, unkownclasses)
     local extra_buf = vim.api.nvim_create_buf(true, true)
     local new_win_title = "Unknown classes"
     local new_win_width = Utils.get_longest(unkownclasses, #new_win_title)
+
     local win_info = vim.api.nvim_win_get_position(win)
 
     vim.api.nvim_buf_set_lines(extra_buf, 0, -1, false, unkownclasses)
 
+    -- Redraw to get the correct height
+    vim.cmd("redraw")
+
     local new_win = vim.api.nvim_open_win(extra_buf, false, {
         relative = "win",
-        row = win_info[1] + height + #unkownclasses + 1,
-        col = win_info[2],
+        win = win,
+        row =  height + 1,
+        col = 0,
         height = #unkownclasses,
         width = new_win_width,
         style = "minimal",
