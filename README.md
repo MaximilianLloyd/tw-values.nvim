@@ -4,6 +4,8 @@
 #### Show CSS values of all tailwindcss classes on an element
 
 [![Lua](https://img.shields.io/badge/Lua-blue.svg?style=for-the-badge&logo=lua)](http://www.lua.org)
+[![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
+
 </div>
 
 ![Preview of tw-values.nvim in neovim](/preview.jpg)
