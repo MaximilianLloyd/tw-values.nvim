@@ -1,6 +1,6 @@
 local M = {}
 
-local standard = function (lang)
+local standard = function(lang)
     return vim.treesitter.query.parse(lang, [[
     (attribute
       (attribute_name) @attr_name
@@ -12,27 +12,53 @@ local standard = function (lang)
 end
 
 local tsx_parser = function()
-    return vim.treesitter.query.parse("tsx", [[
-    (jsx_attribute
-      (property_identifier) @attr_name
-      (#match? @attr_name "className")
-      (string
-      (string_fragment) @values
-      )
-    )
-]])
+    return {
+        vim.treesitter.query.parse("tsx", [[
+            (jsx_attribute
+              (property_identifier) @attr_name
+              (#match? @attr_name "className")
+              (string
+              (string_fragment) @values
+              )
+            )
+        ]]),
+        vim.treesitter.query.parse("tsx", [[
+              (string
+              (string_fragment) @values
+              )
+        ]]),
+    }
 end
 
+-- For template strings
 local typescript_parser = function()
-    return standard("html")
+    return {
+        standard("html")
+    }
 end
 
 local astro_parser = function()
-    return standard("astro")
+    return {
+        standard("astro")
+    }
 end
 
 local vue_parser = function()
-    return standard("vue")
+    return {
+        standard("vue")
+    }
+end
+
+local svelte_parser = function()
+    return {
+        standard("svelte")
+    }
+end
+
+local html_parser = function()
+    return {
+        standard("html")
+    }
 end
 
 M.parsers = {
@@ -40,9 +66,11 @@ M.parsers = {
     typescript = typescript_parser,
     astro = astro_parser,
     vue = vue_parser,
+    svelte = svelte_parser,
+    html = html_parser,
 }
 
-M.get_treesitter = function (bufnr)
+M.get_treesitter = function(bufnr)
     bufnr = bufnr or vim.api.nvim_get_current_buf()
 
     local ft = vim.bo[bufnr].ft
