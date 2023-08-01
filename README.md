@@ -18,17 +18,17 @@ This is a work in progress, if you experience any problems feel free to make an 
 
 some notes:
 - This plugin looks for an existing running tailwind LSP server.
-- Under the hood this plugin uses the LSP hover functionality, if this is altered significantly in the tailwind lsp this plugin can break.
+- Under the hood this plugin uses the LSP hover functionality, if this is altered significantly in the tailwind LSP server this plugin can break.
 
 ---
 
 ## Why did i make this?
 
-When you apply a lot of classes in tailwind, it can be taxing to read through all of them and think what each one does.
+When you apply a lot of classes in tailwind, it can be taxing to read through all of them and think about what each one does.
 
 ---
 
-## Installaton
+## Installation
 
 Install using your favorite plugin manager.
 
