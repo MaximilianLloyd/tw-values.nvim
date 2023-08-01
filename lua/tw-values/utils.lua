@@ -95,6 +95,20 @@ M.get_tw_client = function()
     return tw
 end
 
+M.format_to_css = function(t)
+    local result = {
+        "{"
+    }
+
+    for _, value in ipairs(t) do
+        table.insert(result, #result + 1, value)
+    end
+
+    table.insert(result, #result + 1, "}")
+
+    return result
+end
+
 
 
 return M

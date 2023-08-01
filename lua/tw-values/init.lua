@@ -7,6 +7,7 @@ local M = {}
 function M.defaults()
     local defaults = {
         border = "rounded",
+        show_unknown_classes = true,
     }
     return defaults
 end
@@ -20,7 +21,7 @@ function M.setup(options)
     M.options = vim.tbl_deep_extend("force", M.defaults(), options)
 end
 
-function TreesitterTest(bufnr)
+function M.show(bufnr)
     bufnr = bufnr or vim.api.nvim_get_current_buf()
 
     local cursor = vim.treesitter.get_node({
@@ -35,9 +36,6 @@ function TreesitterTest(bufnr)
 
     local parent = cursor:parent()
     local parent_parent = parent:parent()
-
-    print("parent: " .. parent:type())
-    print("parent_parent: " .. parent_parent:type())
 
     -- Returns multiple
     local queries = Parser.get_treesitter(bufnr)
@@ -66,13 +64,11 @@ function TreesitterTest(bufnr)
                 local tw = Utils.get_tw_client()
 
                 if tw == nil then
-                    print("No tailwindcss client found")
+                    vim.notify("No tailwindcss client found", vim.log.levels.ERROR)
                     return
                 end
 
-                local results = {
-                    "{"
-                }
+                local results = {}
 
                 local init_col = range[2]
                 local init_row = range[1]
@@ -92,14 +88,13 @@ function TreesitterTest(bufnr)
                         index = index + 1
 
                         if err then
-                            print("Error getting tailwind config")
+                            vim.notify("Error getting tailwind config", vim.log.levels.ERROR)
                             return
                         end
 
                         if result == nil then
                             table.insert(unknown_classes, #unknown_classes + 1, " ." .. class.str)
                         else
-                            -- print(vim.inspect(result.contents))
                             local extracted, should_add_newline = Extract(result)
 
                             if (should_add_newline) then
@@ -111,15 +106,8 @@ function TreesitterTest(bufnr)
                             end
                         end
 
-
                         if index == #classes then
-                            table.insert(results, #results + 1, "}")
-                            local height = #results + 1
-
-                            print(vim.inspect(unknown_classes))
-                            local longest = Utils.get_longest(results)
-
-                            OpenFloats(results, unknown_classes, longest, height)
+                            OpenFloats(results, unknown_classes)
                         end
                     end, bufnr)
                 end
@@ -161,7 +149,6 @@ end
 
 function ExtractWithPadding(text)
     local extracted = vim.split(text, "\n")
-    print(vim.inspect(extracted))
 
     local padded = Utils.leftpad_table(extracted, 4, " ")
     return padded
@@ -176,15 +163,25 @@ function ExtractPseudoClass(text)
     return extracted
 end
 
-function OpenFloats(results, unkownclasses, width, height)
+function OpenFloats(results, unkownclasses)
     -- If no results, do nothing
     if (#results == 0) then
         return
     end
 
-    local buf, win = vim.lsp.util.open_floating_preview(results, "css", {
+    -- Indicates that the attribute is not class
+    if (#results == 0 and #unkownclasses > 0) then
+        return
+    end
+
+    local formatted_results = Utils.format_to_css(results)
+    local title = "Tailwind CSS values"
+    local longest = Utils.get_longest(formatted_results, #title)
+    local height = #formatted_results
+
+    local buf, win = vim.lsp.util.open_floating_preview(formatted_results, "css", {
         border = M.options.border,
-        width = width,
+        width = longest,
         height = height,
         title = "Tailwind CSS values",
         focus = true,
@@ -192,7 +189,7 @@ function OpenFloats(results, unkownclasses, width, height)
 
     -- Open a window below it
 
-    if (#unkownclasses == 0) then
+    if (#unkownclasses == 0 or M.options.show_unknown_classes == false) then
         return
     end
 
@@ -221,12 +218,9 @@ function OpenFloats(results, unkownclasses, width, height)
     }, {
         buffer = buf,
         callback = function()
-            print("Cursor moved")
             vim.api.nvim_win_close(new_win, true)
         end
     })
 end
-
-vim.keymap.set("n", "<leader>tt", "<cmd>lua TreesitterTest()<cr>", { noremap = true, silent = true })
 
 return M;
