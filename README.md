@@ -1,6 +1,9 @@
+<div align="center">
 # tw-values.nvim
+#### Show CSS values of all tailwindcss classes on an element
 
-Preview the computed css values of tailwind classes on an element.
+[![Lua](https://img.shields.io/badge/Lua-blue.svg?style=for-the-badge&logo=lua)](http://www.lua.org)
+</div>
 
 ![Preview of tw-values.nvim in neovim](/preview.jpg)
 
