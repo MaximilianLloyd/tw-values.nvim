@@ -65,7 +65,7 @@ Right now the configurtion options are quite minmal.
 ```lua
 ...
 {
-    border = "rounded" -- Valid window border style,
+    border = "rounded", -- Valid window border style,
     show_unknown_classes = true -- Shows the unknown classes popup
 }
 ...
