@@ -50,7 +50,7 @@ use({ "MaximilianLloyd/tw-values.nvim" })
     },
     config = function()
         require("tw-values").setup({
-            border = "rounded" -- Valid window border style,
+            border = "rounded", -- Valid window border style,
             show_unknown_classes = true -- Shows the unknown classes popup
         })
     end
