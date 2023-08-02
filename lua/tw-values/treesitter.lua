@@ -58,6 +58,12 @@ local html_parser = function()
     }
 end
 
+local htmldjango_parser = function()
+    return {
+        standard("html")
+    }
+end
+
 M.parsers = {
     typescriptreact = tsx_parser,
     typescript = typescript_parser,
@@ -65,6 +71,7 @@ M.parsers = {
     vue = vue_parser,
     svelte = svelte_parser,
     html = html_parser,
+    htmldjango = htmldjango_parser,
 }
 
 M.get_treesitter = function(bufnr)
