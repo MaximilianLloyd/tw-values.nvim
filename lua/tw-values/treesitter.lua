@@ -73,8 +73,9 @@ M.get_treesitter = function(bufnr)
     local ft = vim.bo[bufnr].ft
 
     if (M.parsers[ft] == nil) then
-        vim.notify("No parser found for " .. ft, vim.log.levels.ERROR)
-        return
+        return {
+            standard("html")
+        }
     end
 
     return M.parsers[ft]()
