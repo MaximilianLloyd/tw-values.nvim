@@ -8,6 +8,11 @@ function M.defaults()
     local defaults = {
         border = "rounded",
         show_unknown_classes = true,
+        focus_preview = false,
+        copy_register = "",
+        keymaps = {
+            copy = "<C-y>"
+        }
     }
     return defaults
 end
@@ -185,10 +190,13 @@ function OpenFloats(results, unkownclasses)
         width = longest,
         height = height,
         title = "Tailwind CSS values",
-        focus = true,
     })
-
+    -- Focus buf
     -- Open a window below it
+    if (M.options.focus_preview == true) then
+        SetKeymaps(buf, win)
+    end
+    -- Set keymap for buffer to yank text
 
     if (#unkownclasses == 0 or M.options.show_unknown_classes == false) then
         return
@@ -209,7 +217,7 @@ function OpenFloats(results, unkownclasses)
     local new_win = vim.api.nvim_open_win(extra_buf, false, {
         relative = "win",
         win = win,
-        row =  height + 1,
+        row = height + 1,
         col = 0,
         height = #unkownclasses,
         width = new_win_width,
@@ -225,7 +233,28 @@ function OpenFloats(results, unkownclasses)
         buffer = buf,
         callback = function()
             vim.api.nvim_win_close(new_win, true)
+
+
+            -- Set maps back
         end
+    })
+end
+
+function SetKeymaps(buf, win)
+    vim.api.nvim_set_current_win(win)
+    vim.keymap.set("n", M.options.keymaps.copy, function ()
+        local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+        -- Remove first and last
+        --
+        table.remove(lines, 1)
+        table.remove(lines, #lines)
+
+        local joined = table.concat(lines, "\n")
+
+        vim.fn.setreg(M.options.copy_register, joined)
+        vim.notify("Copied to clipboard", vim.log.levels.INFO)
+    end, {
+        buffer = buf,
     })
 end
 
