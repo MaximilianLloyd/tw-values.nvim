@@ -119,6 +119,10 @@ function M.show(bufnr)
             end
         end
     end
+	if not parent then
+		print("No parent found")
+		return
+	end
 end
 
 local CLASS_CHAR = "."
