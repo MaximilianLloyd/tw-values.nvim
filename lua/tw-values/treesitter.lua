@@ -1,11 +1,16 @@
 local M = {}
 
 local standard = function(lang)
-    return vim.treesitter.query.parse(lang, [[
-      (quoted_attribute_value
-      (attribute_value) @values
-      )
-    ]])
+	return vim.treesitter.query.parse(
+		lang,
+		[[
+    (attribute
+      (attribute_name) @attr_name
+        (quoted_attribute_value (attribute_value) @values)
+        (#match? @attr_name "class")
+    )
+    ]]
+	)
 end
 
 local tsx_parser = function()
