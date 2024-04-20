@@ -40,7 +40,11 @@ function M.show(bufnr)
     end
 
     local parent = cursor:parent()
-    local parent_parent = parent:parent()
+
+    if not parent then
+      print("No parent found")
+      return
+    end
 
     -- Returns multiple
     local queries = Parser.get_treesitter(bufnr)
@@ -52,7 +56,7 @@ function M.show(bufnr)
 
     local found_match = false
 
-    for index, query in ipairs(queries) do
+    for _, query in ipairs(queries) do
         if found_match then
             break
         end
@@ -89,7 +93,7 @@ function M.show(bufnr)
                             character = class.col
                         }
 
-                    }, function(err, result, ctx, config)
+                    }, function(err, result, _, _)
                         index = index + 1
 
                         if err then
@@ -106,7 +110,7 @@ function M.show(bufnr)
                                 table.insert(extracted, 1, " ")
                             end
 
-                            for i, value in ipairs(extracted) do
+                            for _, value in ipairs(extracted) do
                                 table.insert(results, #results + 1, value)
                             end
                         end
@@ -210,8 +214,6 @@ function OpenFloats(results, unkownclasses)
     local extra_buf = vim.api.nvim_create_buf(true, true)
     local new_win_title = "Unknown classes"
     local new_win_width = Utils.get_longest(unkownclasses, #new_win_title)
-
-    local win_info = vim.api.nvim_win_get_position(win)
 
     vim.api.nvim_buf_set_lines(extra_buf, 0, -1, false, unkownclasses)
 

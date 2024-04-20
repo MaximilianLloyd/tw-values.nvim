@@ -39,7 +39,7 @@ M.mysplit = function(inputstr, sep, init_col, init_row)
         end
 
         for str in string.gmatch(row, "([^" .. sep .. "]+)") do
-            local start_pos, end_pos = row:find(str, offset + 1, true)
+            local start_pos, _ = row:find(str, offset + 1, true)
             local new_col = base_col + start_pos - 1
 
             table.insert(t, {
