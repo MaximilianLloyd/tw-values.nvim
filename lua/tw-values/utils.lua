@@ -77,22 +77,14 @@ M.get_longest = function(t, init_len)
 end
 
 M.get_tw_client = function()
-    local clients = vim.lsp.get_active_clients()
+    local clients = vim.lsp.get_clients({name = "tailwindcss"})
 
-    local tw = nil
-
-    for _, client in pairs(clients) do
-        if client.name == "tailwindcss" then
-            tw = client
-        end
-    end
-
-    if tw == nil then
+    if not clients[1] then
         print("No tailwindcss client found")
         return
     end
 
-    return tw
+    return clients[1]
 end
 
 M.format_to_css = function(t)
