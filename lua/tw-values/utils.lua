@@ -39,7 +39,7 @@ M.mysplit = function(inputstr, sep, init_col, init_row)
         end
 
         for str in string.gmatch(row, "([^" .. sep .. "]+)") do
-            local start_pos, end_pos = row:find(str, offset + 1, true)
+            local start_pos, _ = row:find(str, offset + 1, true)
             local new_col = base_col + start_pos - 1
 
             table.insert(t, {
@@ -77,22 +77,14 @@ M.get_longest = function(t, init_len)
 end
 
 M.get_tw_client = function()
-    local clients = vim.lsp.get_active_clients()
+    local clients = vim.lsp.get_clients({name = "tailwindcss"})
 
-    local tw = nil
-
-    for _, client in pairs(clients) do
-        if client.name == "tailwindcss" then
-            tw = client
-        end
-    end
-
-    if tw == nil then
+    if not clients[1] then
         print("No tailwindcss client found")
         return
     end
 
-    return tw
+    return clients[1]
 end
 
 M.format_to_css = function(t)
