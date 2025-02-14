@@ -63,6 +63,12 @@ local html_parser = function()
     }
 end
 
+local templ_parser = function()
+    return {
+        standard("templ")
+    }
+end
+
 M.parsers = {
     typescriptreact = tsx_parser,
     typescript = typescript_parser,
@@ -70,6 +76,7 @@ M.parsers = {
     vue = vue_parser,
     svelte = svelte_parser,
     html = html_parser,
+    templ = templ_parser,
 }
 
 M.get_treesitter = function(bufnr)
