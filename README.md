@@ -96,6 +96,7 @@ The currently supported languages are the following:
 - astro
 - vue
 - svelte
+- templ
 - html
 
 Uses HTML parser as fallback, which works for a lot of variants. Like htmldjango etc.
