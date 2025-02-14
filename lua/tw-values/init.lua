@@ -184,6 +184,9 @@ local CLASS_CHAR = "."
 local MEDIA_QUER_CHAR = "@"
 
 function Extract(lsp_result)
+    if not lsp_result then
+      return {}
+    end
     local pre_text = lsp_result.contents.value
 
     -- Get first line
