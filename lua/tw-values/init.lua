@@ -122,6 +122,57 @@ function M.show(bufnr)
                 end
             end
         end
+
+        if found_match then
+            break
+        end
+        -- Display tailwind values for individual classes
+        parent = parent:parent()
+        if parent then
+        for id, _ in query:iter_captures(parent, bufnr, 0, -1) do
+
+            local name = query.captures[id]
+
+            if (name == "values") then
+
+                local tw = Utils.get_tw_client()
+
+                if tw == nil then
+                    vim.notify("No tailwindcss client found", vim.log.levels.ERROR)
+                    return
+                end
+
+                local results = {}
+
+                tw.request("textDocument/hover", {
+                    textDocument = vim.lsp.util.make_text_document_params(),
+                    position = {
+                      line = vim.api.nvim_win_get_cursor(0)[1] - 1,
+                      character = vim.api.nvim_win_get_cursor(0)[2],
+                    }
+
+                }, function(err, result, _, _)
+
+                    if err then
+                        vim.notify("Error getting tailwind config", vim.log.levels.ERROR)
+                        return
+                    end
+
+                    local extracted, should_add_newline = Extract(result)
+
+                    if (should_add_newline) then
+                        table.insert(extracted, 1, " ")
+                    end
+
+                    for _, value in ipairs(extracted) do
+                        table.insert(results, #results + 1, value)
+                    end
+
+                    OpenFloats(results)
+                end, bufnr)
+            end
+        end
+      end
     end
 	if not parent then
 		print("No parent found")
@@ -176,14 +227,15 @@ function ExtractPseudoClass(text)
     return extracted
 end
 
-function OpenFloats(results, unkownclasses)
+function OpenFloats(results, unknownclasses)
+    unknownclasses = unknownclasses or {}
     -- If no results, do nothing
     if (#results == 0) then
         return
     end
 
     -- Indicates that the attribute is not class
-    if (#results == 0 and #unkownclasses > 0) then
+    if (#results == 0 and #unknownclasses > 0) then
         return
     end
 
@@ -206,16 +258,16 @@ function OpenFloats(results, unkownclasses)
     end
     -- Set keymap for buffer to yank text
 
-    if (#unkownclasses == 0 or M.options.show_unknown_classes == false) then
+    if (#unknownclasses == 0 or M.options.show_unknown_classes == false) then
         return
     end
 
     -- Createa  new window
     local extra_buf = vim.api.nvim_create_buf(true, true)
     local new_win_title = "Unknown classes"
-    local new_win_width = Utils.get_longest(unkownclasses, #new_win_title)
+    local new_win_width = Utils.get_longest(unknownclasses, #new_win_title)
 
-    vim.api.nvim_buf_set_lines(extra_buf, 0, -1, false, unkownclasses)
+    vim.api.nvim_buf_set_lines(extra_buf, 0, -1, false, unknownclasses)
 
     -- Redraw to get the correct height
     vim.cmd("redraw")
@@ -225,7 +277,7 @@ function OpenFloats(results, unkownclasses)
         win = win,
         row = height + 1,
         col = 0,
-        height = #unkownclasses,
+        height = #unknownclasses,
         width = new_win_width,
         style = "minimal",
         title = new_win_title,
