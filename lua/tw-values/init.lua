@@ -12,7 +12,8 @@ function M.defaults()
         copy_register = "",
         keymaps = {
             copy = "<C-y>"
-        }
+        },
+        hover_single_class = false,
     }
     return defaults
 end
@@ -126,53 +127,56 @@ function M.show(bufnr)
         if found_match then
             break
         end
+
         -- Display tailwind values for individual classes
-        parent = parent:parent()
-        if parent then
-        for id, _ in query:iter_captures(parent, bufnr, 0, -1) do
+        if M.options.focus_preview == true then
+          parent = parent:parent()
+          if parent then
+          for id, _ in query:iter_captures(parent, bufnr, 0, -1) do
 
-            local name = query.captures[id]
+              local name = query.captures[id]
 
-            if (name == "values") then
+              if (name == "values") then
 
-                local tw = Utils.get_tw_client()
+                  local tw = Utils.get_tw_client()
 
-                if tw == nil then
-                    vim.notify("No tailwindcss client found", vim.log.levels.ERROR)
-                    return
-                end
+                  if tw == nil then
+                      vim.notify("No tailwindcss client found", vim.log.levels.ERROR)
+                      return
+                  end
 
-                local results = {}
+                  local results = {}
 
-                tw.request("textDocument/hover", {
-                    textDocument = vim.lsp.util.make_text_document_params(),
-                    position = {
-                      line = vim.api.nvim_win_get_cursor(0)[1] - 1,
-                      character = vim.api.nvim_win_get_cursor(0)[2],
-                    }
+                  tw.request("textDocument/hover", {
+                      textDocument = vim.lsp.util.make_text_document_params(),
+                      position = {
+                        line = vim.api.nvim_win_get_cursor(0)[1] - 1,
+                        character = vim.api.nvim_win_get_cursor(0)[2],
+                      }
 
-                }, function(err, result, _, _)
+                  }, function(err, result, _, _)
 
-                    if err then
-                        vim.notify("Error getting tailwind config", vim.log.levels.ERROR)
-                        return
-                    end
+                      if err then
+                          vim.notify("Error getting tailwind config", vim.log.levels.ERROR)
+                          return
+                      end
 
-                    local extracted, should_add_newline = Extract(result)
+                      local extracted, should_add_newline = Extract(result)
 
-                    if (should_add_newline) then
-                        table.insert(extracted, 1, " ")
-                    end
+                      if (should_add_newline) then
+                          table.insert(extracted, 1, " ")
+                      end
 
-                    for _, value in ipairs(extracted) do
-                        table.insert(results, #results + 1, value)
-                    end
+                      for _, value in ipairs(extracted) do
+                          table.insert(results, #results + 1, value)
+                      end
 
-                    OpenFloats(results)
-                end, bufnr)
+                      OpenFloats(results)
+                  end, bufnr)
+              end
             end
+          end
         end
-      end
     end
 	if not parent then
 		print("No parent found")
