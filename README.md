@@ -65,7 +65,7 @@ use({ "MaximilianLloyd/tw-values.nvim" })
 
 ## Configuration
 
-Right now the configurtion options are quite minmal.
+Right now the configurtion options are quite minimal.
 
 ```lua
 ...
@@ -74,6 +74,7 @@ Right now the configurtion options are quite minmal.
     show_unknown_classes = true, -- Shows the unknown classes popup
     focus_preview = false, -- Sets the preview as the current window
     copy_register = "", -- The register to copy values to,
+    hover_single_class = false, -- Shows tailwind values for single class
     keymaps = {
         copy = "<C-y>"  -- Normal mode keymap to copy the CSS values between {}
     }
